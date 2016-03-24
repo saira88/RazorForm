@@ -1,0 +1,99 @@
+﻿@{
+    Page.Title = "Insert";
+    Layout = "~/_Layout.cshtml";
+
+    //insert a row into the Artist table
+    //  ArtistID int identity
+    //  ArtistName string(120) nullable (for this example
+    //                                   we will treat as required)
+
+    //obtain form data
+    var artistname = Request.Form["ArtistName"];
+    var thebutton = Request.Form["theButton"];
+    
+    //create some server side validation using the
+    //Validation and Validator Helper classes
+    //for this example, we will treat the nullable ArtistName
+    //as a required field.
+    
+    //example of the RequiredField("controlname", user msg) using Validation
+    Validation.RequireField("ArtistName", "Name is required");
+    
+    //example of Validator inside Validation.Add("controlname", multiple validator statements)
+    Validation.Add("ArtistName",
+    //    Validator.Required("Artist Name is required"),
+        Validator.StringLength(20, 1, "Name is limited to 120 characters"));
+
+}
+
+<header class="jumbotron">
+    <h2>Insert into DataBase</h2>
+</header>
+
+<section class="form-group">
+    @if (IsPost)
+    {
+        //this is a postback event
+        if (thebutton.Equals("cancel"))
+        {
+            //user cancelled the form
+            <p><span style="color:blue">User has cancelled the operation.</span></p>
+        }
+        else
+        {
+            //to execute the validation setup use the Validation.IsValid()
+            if (Validation.IsValid())
+            { 
+                //surround the action of the processing with user friendly error handling techniques
+                try
+                {
+                    //user wishes to add data to the database
+                    //actions are connect, create command, execute
+                    var db = Database.Open("ChinookDB");
+                    var commandstatement = "INSERT into Artist (Name) "
+                                         + "VALUES (@0)";
+
+                    //execution of SQL DML statments uses the .Execute(command, arguments...)
+                    db.Execute(commandstatement, artistname);
+
+                    //output a message to the user that you were successful
+                    <p><span style="color:blue">Artist has been saved.</span></p>
+                }
+
+                catch (Exception ex)
+                {
+                    <p><strong><span style="color:crimson">@ex.Message</span></strong></p>
+                }
+            }
+        }
+    }
+    else
+    {
+        //can be used to initialize items on your page
+        artistname = "Enter Name";
+    }
+
+    <!--One place that you can display all validation message is in a
+        summary location
+        Messages are display by default as a bulletted list-->
+    @Html.ValidationSummary()<br/>
+
+    <form id="theForm" action="" method="post">
+        <label id="forArtistName">Enter Artist Name:</label>&nbsp;&nbsp;
+        <input type="text" name="ArtistName" id="ArtistName"
+               value="@artistname" />
+        <!--A second location for validation messages are beside the
+            control the message pertains to-->
+        @Html.ValidationMessage("ArtistName");
+        <br /><br />
+        <button type="submit" class="btn btn-primary"
+                name="theButton" value="insert">
+            Add to file
+        </button>
+        &nbsp;&nbsp;
+        <button type="submit" class="btn"
+                name="theButton" value="cancel">
+            Cancel
+        </button>
+    </form>
+</section>

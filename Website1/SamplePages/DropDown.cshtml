@@ -1,0 +1,65 @@
+﻿@{
+    Page.Title = "DropDown";
+    Layout = "~/_Layout.cshtml";
+
+    var choice = Request["CodingSample"];
+}
+
+<header class="jumbotron">
+    <h2>Select (dropdown) control</h2>
+</header>
+<section>
+    @if (IsPost)
+    {
+        if (choice.IsEmpty())
+        {
+            <p><strong><span style="color:red">Please make a choice.</span></strong></p>
+
+        }
+        else
+        {
+            //review a case statement
+            //depending on the selection we will redirect
+            //the user to the appropriate web page
+            switch (choice)
+            {
+                case "TextBoxes":
+                    {
+                        Response.Redirect("~/SamplePages/TextBoxes.cshtml");
+                        break;
+                    }
+                case "CheckBoxes":
+                    {
+                        Response.Redirect("~/SamplePages/CheckBoxes.cshtml");
+                        break;
+                    }
+                case "RadioButtons":
+                    {
+                        Response.Redirect("~/SamplePages/RadioButtons.cshtml");
+                        break;
+                    }
+                default:
+                    {
+                        <p><strong><span style="color:red">Please make a choice.</span></strong></p>
+
+                        break;
+                    }
+            }
+        }
+    }
+    <div class="form-group">
+        <form id="theForm" action="" method="post">
+            <label id="forCodingSample">Select the sample to view</label><br /><br />
+            <select id="CodingSample" name="CodingSample">
+                <option value="">Make Selection</option>
+                <option value="TextBoxes">TextBox</option>
+                <option value="CheckBoxes">CheckBox</option>
+                <option value="RadioButtons">RadioButton</option>
+            </select><br /><br />
+            <button type="submit" class="btn btn-primary" value="submit"
+                    name="formbutton">
+                Go To ...
+            </button>
+        </form>
+    </div>
+</section>

@@ -1,0 +1,97 @@
+﻿@{
+    Page.Title = "WebGrid";
+    Layout = "~/_Layout.cshtml";
+    
+    //grab any passed parameters from another page
+    //to grab parameters that used the Get method for passing
+    //you will use the Request instance .QueryString["identifier"]
+    //if the identifier does not exist then your value will be empty
+    var artistid = Request.QueryString["aid"];
+    var artistname = Request.QueryString["an"];
+    
+    //if you desire the user to have gone through another page
+    //to get to this page AND you wish to stop the user
+    //then test the .QueryString values for empty and if empty
+    //redirect to the desired page
+    if (artistid.IsEmpty() || artistname.IsEmpty())
+    {
+        Response.Redirect("OneRecordDatabaseQuery.cshtml");
+    }
+    
+    //get your data from the database
+    var db = Database.Open("ChinookDB");
+    var querystatement = "SELECT AlbumID, Title "
+                        + "FROM Album "
+                        + "WHERE ArtistID = @0 "
+                        + "ORDER BY Title";
+    //this query expects 0, 1 or more row(s) to be return from
+    //the database.
+    //The command method to use in this case is .Query(statement, variables)
+    var queryresults = db.Query(querystatement, artistid);
+}
+
+@section head
+{
+<link href="~/Content/CustomOverrides.css" rel="stylesheet" />
+}
+<header class="jumbotron">
+    <h2>Multiple Record DB Query using WebGrid</h2>
+</header>
+
+<section>
+    <h3>Album for the artist: @artistname</h3>
+    <!--test to see if you should output a message or data-->
+    @if (queryresults.Count() == 0)
+    {
+        //no albums were found for the query
+        <p><strong><span style="color:crimson">No albums found for artist.</span></strong></p>
+
+    }
+    else
+    {
+        //display your data in whatever format you desire
+        //we wish to display the data in a table like format
+        //you could create this format using
+        //a) logic and <Table><TR><TD>
+        //b) using the object WebGrid
+
+        //create an instance of WebGrid assigning the collection
+        //the collection is your query results
+        var grid = new WebGrid(queryresults);
+
+        //use the method .GetHTML() of the WebGrid instance
+        //to display and format the table like display
+
+        //mode:  allows your to specify the paging mode
+        //firstText: specifies the string to indicate first page
+        //lastText: specifies the string to indeicate last page
+
+        //you can add style: to each grid.Column
+
+        //you can use the tableStyle option of WebGrid
+        //tableStyle can be manipulated with bootstrap classes such as
+        // table table-bordered table-striped table-hover etc
+
+        //you can place an <a> tag on each row of your table
+        //to refer to the values from the collection displayd
+        //on each row, you will use the @item.fieldname reference
+        //@item refers to the current row of the collection
+        //which is being used to create the WebGrid row
+
+        @grid.GetHtml(
+        tableStyle: "table table-bordered table-striped table-hover",
+        mode: WebGridPagerModes.All,
+        firstText: "Start",
+        lastText: "End",
+        columns: grid.Columns(
+        grid.Column(columnName: "AlbumID", header: "ID", style: "colidpad"),
+        grid.Column(columnName: "Title"),
+        grid.Column(header: "",
+        format: @<text><a href="~/SamplePages/OneRecordDatabaseQuery.cshtml?alid=@item.AlbumID">
+                Back
+            </a></text>)
+          )
+          )
+    }
+
+</section>

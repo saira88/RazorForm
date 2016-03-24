@@ -1,0 +1,13 @@
+﻿.jumbotron {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.colidpad
+{
+    width:50px;
+    padding-right: 15px;
+}
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th{
+    background-color:aqua;
+}

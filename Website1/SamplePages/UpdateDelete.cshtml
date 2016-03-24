@@ -1,0 +1,370 @@
+﻿@{
+    Page.Title = "Full CRUD";
+    Layout = "~/_Layout.cshtml";
+
+    //obtain form data
+    var searchartistid = Request.Form["SearchArtistId"];
+    var artistid = Request.Form["ArtistID"];
+    var artistname = Request.Form["ArtistName"];
+    var thebutton = Request.Form["theButton"];
+
+    //obtain the data for the select control
+    var db = Database.Open("ChinookDB");
+    var querylist = "SELECT ArtistId, Name "
+                    + "FROM Artist "
+                    + "ORDER BY Name";
+    var artistlist = db.Query(querylist);
+    
+    //example of Validator inside Validation.Add("controlname", multiple validator statements)
+    Validation.Add("ArtistName",
+            Validator.Required("Artist Name is required"),
+        Validator.StringLength(120, 1, "Name is limited to 120 characters"));
+}
+
+<header class="jumbotron">
+    <h2>Full CRUD Database Maintenance</h2>
+</header>
+
+<section class="form-group">
+    @if (IsPost)
+    {
+        //this is a postback event
+        if (thebutton.Equals("cancel"))
+        {
+            //user cancelled the form
+            <p><span style="color:blue">User has cancelled the operation.</span></p>
+        }
+        else if (thebutton.Equals("fetch"))
+        {
+            if (searchartistid.IsEmpty())
+            {
+                <p><span style="color:blue">Please select an artist first.</span></p>
+            }
+            else
+            {
+                try
+                {
+                    var fetchstatement = "SELECT ArtistId, Name "
+                                        + "FROM Artist "
+                                        + "WHERE ArtistId = @0";
+                    var artistdata = db.QuerySingle(fetchstatement, searchartistid);
+                    if (artistdata == null)
+                    {
+                        <p><span style="color:blue">Artist not found.</span></p>
+                    }
+                    else
+                    {
+                        artistid = artistdata.ArtistId.ToString();
+                        artistname = artistdata.Name;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    <p><strong><span style="color:crimson">@ex.Message</span></strong></p>
+                }
+            }
+        }
+        else if (thebutton.Equals("update"))
+        {
+            //check to see if the current artist data is showing
+            if (artistid.IsEmpty())
+            {
+                <p><span style="color:blue">Please look up an artist first.</span></p>
+            }
+            else
+            {
+                if (Validation.IsValid())
+                {
+                    try
+                    {
+                        var updatestatement = "UPDATE Artist "
+                                            + "SET Name = @0 "
+                                            + "WHERE ArtistId = @1";
+                        //capture the result row count of data rows affected by the sql command
+                        //the value 1 would suggest that 1 data row was affected by the update command
+                        var results = db.Execute(updatestatement, artistname, artistid);
+                        if (results == 1)
+                        {
+                            <p><span style="color:blue">Artist updated.</span></p>
+                            artistlist = db.Query(querylist);
+                        }
+                        else
+                        {
+                            <p><span style="color:crimson">Artist not found.</span></p>
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        <p><strong><span style="color:crimson">@ex.Message</span></strong></p>
+                    }
+                }
+            }
+        }
+        else if (thebutton.Equals("delete"))
+        {
+            //check to see if the current artist data is showing
+            if (artistid.IsEmpty())
+            {
+                <p><span style="color:blue">Please look up an artist first.</span></p>
+            }
+            else
+            {
+                try
+                {
+                    var deletestatement = "DELETE Artist "
+                                        + "WHERE ArtistId = @0";
+                    var results = db.Execute(deletestatement, artistid);
+                    if (results == 1)
+                    {
+                        <p><span style="color:blue">Artist removed.</span></p>
+                        artistlist = db.Query(querylist);
+                    }
+                    else
+                    {
+                        <p><span style="color:crimson">Artist not found.</span></p>
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    <p><strong><span style="color:crimson">@ex.Message</span></strong></p>
+                }
+            }
+        }
+        else
+        {
+            //to execute the validation setup use the Validation.IsValid()
+            if (Validation.IsValid())
+            {
+                //surround the action of the processing with user friendly error handling techniques
+                try
+                {
+                    //user wishes to add data to the database
+                    //actions are connect, create command, execute
+                    //db was declared above.
+                    var commandstatement = "INSERT into Artist (Name) "
+                                         + "VALUES (@0)";
+
+                    //execution of SQL DML statments uses the .Execute(command, arguments...)
+                    db.Execute(commandstatement, artistname);
+
+                    //output a message to the user that you were successful
+                    <p><span style="color:blue">Artist has been saved.</span></p>
+                    artistlist = db.Query(querylist);
+                }
+
+                catch (Exception ex)
+                {
+                    <p><strong><span style="color:crimson">@ex.Message</span></strong></p>
+                }
+            }
+        }
+    }
+    @*else
+        {
+            //can be used to initialize items on your page
+            artistname = "Enter Name";
+        }*@
+
+
+    @Html.ValidationSummary()<br />
+
+    <form id="theForm" action="" method="post">
+        <!--Lookup Area-->
+        <label id="forSearchArtistID">Artist:</label>&nbsp;&nbsp;
+        <select name="SearchArtistID" id="SearchArtistID">
+            <option value="">Select a artist</option>
+            @foreach (var datarow in artistlist)
+            {
+                if (searchartistid == datarow.ArtistId.ToString())
+                {
+                    <option value="@datarow.ArtistId.ToString() selected">
+                        @datarow.Name.ToString()
+                    </option>
+                }
+                else
+                {
+                    <option value="@datarow.ArtistId.ToString()">
+                        @datarow.Name.ToString()
+                    </option>
+                }
+            }
+        </select>&nbsp;
+        <button type="submit" name="theButton" id="theFetch" class="btn"
+                value="fetch" formnovalidate>
+            Get Artist
+        </button><br /><br />
+
+        <!--Work Area-->
+        <label id="forArtistId">ID:</label>&nbsp;&nbsp;
+        <input type="text" name="ArtistId" id="ArtistId"
+               value="@artistid" readonly maxlength="6" /><br />
+        <label id="forArtistName">Enter Artist Name:</label>&nbsp;&nbsp;
+        <input type="text" name="ArtistName" id="ArtistName"
+               value="@artistname" required maxlength="120" style="width:600px" />
+        @Html.ValidationMessage("ArtistName")
+        <br /><br />
+        <button type="submit" class="btn btn-primary"
+                name="theButton" id="theInsert" value="insert">
+            Add to file
+        </button>
+        &nbsp;&nbsp;
+        <button type="submit" class="btn"
+                name="theButton" id="theUpdate" value="update">
+            Update
+        </button>
+        &nbsp;&nbsp;
+        <button type="submit" class="btn" formnovalidate
+                name="theButton" id="theDelete" value="delete">
+            Remove
+        </button>
+        &nbsp;&nbsp;
+        <button type="submit" class="btn"
+                name="theButton" id="theCancel" value="cancel" formnovalidate>
+            Cancel
+        </button>
+    </form>
+    <!--this javascript is used by the submit buttons to active and display
+        a confirmation message.
+        NOTE: this js uses the id parameter off the button control
+        NOTE: EACH button control has its own UNIQUE id parameter value-->
+    <script type="text/javascript">
+        document.getElementById("theDelete").onclick = ConfirmDelete;
+        function ConfirmDelete() {
+            return confirm("Are you sure you want to remove?");
+        }
+    </script>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,131 @@
+﻿@{
+    Page.Title = "Single DB Query";
+    Layout = "~/_Layout.cshtml";
+
+    var searchartistid = Request["SearchArtistID"];
+    
+    //to ensure that the search argument has some type of value
+    //as to NOT cause the database related code to abort
+    if (searchartistid.IsEmpty())
+    {
+        //a) Request[] returns a string
+        //b) when creating the Sql query, it will be done as a string
+        //for these reasons, the value assigned to the argument variable
+        //   is done as a string
+        searchartistid = "0";
+    }
+    
+    //database access setup
+    
+    //you need to open access to your desidered database
+    //you database can be used in your app via
+    // a) an .sdf within your App_Data folder
+    // b) via a connection string to an external database
+    
+    //for an .mdf database on your Sql Server use the connection name= parameter
+    var db = Database.Open("ChinookDB");
+    
+    //create the Sql command that will be executed on the desidered database
+    //this command will be created as a hard coded string with placeholders
+    //   for that incoming parameters of the command.
+    //the placeholders are referenced as @indexnumber (@0)
+    //your hard coded string needs to have appropriately place spaces
+    //    when you type the string over several physical lines using
+    //    concatenation.
+    string querycommand = "SELECT ArtistID, Name "
+                        + "FROM Artist "
+                        + "WHERE ArtistID = @0";
+    
+    //execute the sql command and capture the results
+    //to execute the querycommand in this example you will use QuerySingle()
+    //WHY?? we are looking up by the primary key, thus only one record should be found
+    //The parameters of the command are a)command statement, b) list of arguments
+    var queryresults = db.QuerySingle(querycommand, searchartistid);                
+                        
+    //example of receiving data from MultipleRecordQueryWebGrid
+    var albumid = Request.QueryString["alid"];
+}
+
+<header class="jumbotron">
+    <h2>Single Record DB Query</h2>
+</header>
+
+<!--display of albumid example for passing data-->
+<p>This album id was selected on the WebGrid: @albumid</p>
+
+<section class="form-group">
+    @if (IsPost)
+    {
+        if (searchartistid.Equals("0"))
+        {
+            //impossible artistid, treat as a missing value
+            <p><strong><span style="color:crimson">Enter an artist id to search.</span></strong></p>
+        }
+        else if (queryresults == null)
+        {
+            //artistid supplied was not found on the database
+            <p><strong><span style="color:crimson">Artist ID not found.</span></strong></p>
+
+        }
+        //else
+        //{
+        //    //you could have display your results before the form
+        //    //where you display your results is up to you and your page design
+        //}
+    }
+    <form id="theForm" action="" method="post">
+        <label id="forSearchArtistID">Enter Artist ID:</label><br />
+        <input type="text" id="SearchArtistID" name="SearchArtistID"
+               value="@searchartistid" /><br /><br />
+        <button type="submit" class="btn btn-primary" value="submit">Search</button>
+        <br /><br />
+    </form>
+
+    Artist ID is: &nbsp;&nbsp;
+    <!--Since the display of the data is outside my IsPost, you will
+        need to recheck that there is actual values to display-->
+    @if (queryresults != null)
+    {
+        //referencing your collection row field can be done in two ways
+        //you can use an index to refer to the column to be displayed
+        @queryresults[0];
+    }
+    <br />
+
+    Artist Name is: &nbsp;&nbsp;
+    @if (queryresults != null)
+    {
+        //referencing your collection row field can be done in two ways
+        //you can use the column name to refer to the column to be displayed
+        @queryresults["Name"];
+        <br/><br/>
+        <a href="~/SamplePages/MutlipleRecordQueryWebGrid.cshtml?aid=@queryresults[0]&an=@queryresults[1]">
+            View Albums
+        </a>
+    }
+
+    
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

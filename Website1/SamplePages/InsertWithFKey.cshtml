@@ -1,0 +1,122 @@
+﻿@{
+    Page.Title = "Insert Fkey";
+    Layout = "~/_Layout.cshtml";
+
+    // obtain the form control values
+    var invoiceid = Request.Form["InvoiceID"];
+    var trackid = Request.Form["TrackID"];
+    var unitprice = Request.Form["UnitPrice"];
+    var quantity = Request.Form["Quantity"];
+    var thebutton = Request.Form["theButton"];
+
+    // obtain the needed query collections for <select>
+    var db = Database.Open("ChinookDB");
+    var queryInvoice = "SELECT InvoiceId "
+                        + "FROM Invoice "
+                        + "ORDER BY InvoiceId";
+    var queryTrack = "SELECT TrackId, Name "
+                    + "FROM Track "
+                    + "ORDER BY Name";
+    var resultsInvoice = db.Query(queryInvoice);
+    var resultsTrack = db.Query(queryTrack);
+}
+
+<header class="jumbotron">
+    <h2>Insert using Select control (FKey)</h2>
+</header>
+
+<section class="form-group">
+    @if (IsPost)
+    {
+        if (thebutton.Equals("cancel"))
+        {
+            <p><span style="color:green">Insert cancelled.</span></p>
+            invoiceid = "";
+            trackid = "";
+            unitprice = "";
+            quantity = "";
+        }
+        else
+        {
+            try
+            {
+                //in this example, the list of fields is NOT in the same physical order
+                //as they exist on the DB table
+                var commandstatement = "INSERT INTO InvoiceLine (InvoiceId, TrackId, Quantity, UnitPrice) "
+                                    + "VALUES(@0, @1, @2, @3)";
+                db.Execute(commandstatement, invoiceid, trackid, quantity, unitprice);
+                <p><span style="color:green">Track has been invoiced.</span></p>
+                //optionally you could clear the fields to get ready for more data entry
+            }
+            catch (Exception ex)
+            {
+                <p><strong><span style="color:crimson">@ex.Message</span></strong></p>
+            }
+        }
+    }
+
+    <form id="theForm" action="" method="post">
+        <label id="forInvoiceID">Invoice ID:</label>&nbsp;&nbsp;
+        <select name="InvoiceID" id="InvoiceID">
+            <option value="">Select an invoice</option>
+            <!--for each row in the collection, one
+            needs to build an option line-->
+            @foreach (var datarow in resultsInvoice)
+            {
+                //one may wish to retain the currently
+                //selected option in the control
+                //between postings
+                if (invoiceid == datarow.InvoiceId.ToString())
+                {
+                    //the row to position the <select> control to
+                    <option value="@datarow.InvoiceId.ToString()" selected>
+                        @datarow.InvoiceId.ToString()
+                    </option>
+                }
+                else
+                {
+                    <option value="@datarow.InvoiceId.ToString()">
+                        @datarow.InvoiceId.ToString()
+                    </option>
+                }
+            }
+        </select><br />
+
+        <label id="forTrackID">Track:</label>&nbsp;&nbsp;
+        <select name="TrackID" id="TrackID">
+            <option value="">Select a track</option>
+            @foreach (var datarow in resultsTrack)
+            {
+                if (trackid == datarow.TrackId.ToString())
+                {
+                    <option value="@datarow.TrackId.ToString()" selected>
+                        @datarow.Name.ToString()
+                    </option>
+                }
+                else
+                {
+                    <option value="@datarow.TrackId.ToString()">
+                        @datarow.Name.ToString()
+                    </option>
+                }
+            }
+        </select><br />
+        <label id="forUnitPrice">Price:</label>&nbsp;&nbsp;
+        <input type="number" name="UnitPrice" id="UnitPrice" value="@unitprice"
+               min="0.0" step="0.01" required /><br />
+        <label id="forQuantity">Quantity:</label>&nbsp;&nbsp;
+        <!-- client side validation will use attributes that are
+            available on the control: type, min, max, step, maxlength, required, etc.-->
+        <input type="number" name="Quantity" id="Quantity" value="@quantity"
+               min="0" step="1" required /><br />
+        <button type="submit" name="theButton" id="InsertButton" value="insert"
+                class="btn btn-primary">
+            Add to Invoice
+        </button>&nbsp;&nbsp;
+        <button type="submit" name="theButton" id="CancelButton" value="cancel"
+                class="btn">
+            Cancel
+        </button>&nbsp;&nbsp;
+
+    </form>
+</section>

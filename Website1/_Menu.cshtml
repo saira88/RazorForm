@@ -1,0 +1,36 @@
+﻿<nav class="navbar navbar-default">
+    <ul class="nav navbar-nav">
+        <!-- each li with this ul represents
+            an item on your menu either a direct
+            reference to a page OR the dropdown menu
+            item group header-->
+        <li><a class="navbar-brand" href="~/index.cshtml">Home</a></li>
+
+        <!--this is the start of a drop down submenu-->
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+               role="button">Form Review<span class="caret"></span></a>
+            <!-- code the sub menu items-->
+            <ul class="dropdown-menu">
+                <li><a href="~/SamplePages/TextBoxes.cshtml">TextBoxes</a></li>
+                <li><a href="~/SamplePages/CheckBoxes.cshtml">CheckBoxes</a></li>
+                <li><a href="~/SamplePages/RadioButtons.cshtml">RadioButtons</a></li>
+                <li><a href="~/SamplePages/DropDown.cshtml">Dropdown</a></li>
+            </ul>
+        </li>
+
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+               role="button">DB Access<span class="caret"></span></a>
+            <!-- code the sub menu items-->
+            <ul class="dropdown-menu">
+                <li><a href="~/SamplePages/OneRecordDatabaseQuery.cshtml">Single Record Query</a></li>
+                <li><a href="~/SamplePages/Insert.cshtml">Insert</a></li>
+                <li><a href="~/SamplePages/InsertWithFKey.cshtml">Insert FKey</a></li>
+                <li><a href="~/SamplePages/UpdateDelete.cshtml">Full CRUD</a></li>
+            </ul>
+        </li>
+
+        <li><a class="navbar-brand" href="~/About.cshtml">About</a></li>
+    </ul>
+</nav>

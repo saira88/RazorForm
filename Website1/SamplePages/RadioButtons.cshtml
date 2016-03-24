@@ -1,0 +1,62 @@
+﻿@{
+    Page.Title = "RadioButtons";
+    Layout = "~/_Layout.cshtml";
+
+    var programming = Request["ProgrammingGroup"];
+    var scripting = Request["ScriptingGroup"];
+}
+
+<header class="jumbotron">
+    <h2>RadioButtons</h2>
+</header>
+@if (IsPost)
+{
+    if (programming.IsEmpty() || scripting.IsEmpty())
+    {
+        <p><strong><span style="color:red">Please choice one from each group.</span></strong></p>
+
+    }
+    else
+    {
+        if (programming.Equals("C#"))
+        {
+            <p> You will greatly enjoy the CSPC1517 course because we use C#.</p>
+        }
+        else
+        {
+            <p>
+                Too bad, drop CSPC1517, learn what is important.
+            @programming is not important.</p>
+        }
+        if (scripting.Equals("Razor"))
+        {
+            <p> You will greatly enjoy the CSPC1517 course because we use Razor.</p>
+        }
+        else
+        {
+            <p>
+                Too bad, drop CSPC1517, learn what is important.
+                @scripting is not important.
+            </p>
+        }
+    }
+}
+<section>
+    <div class="form-group">
+        <form id="theForm" action="" method="post">
+            <label id="forProgrammingGroup">Select your favorite programming language</label><br /><br />
+            <input type="radio" name="ProgrammingGroup" value="C#" />C#<br />
+            <input type="radio" name="ProgrammingGroup" value="Java" />Java<br />
+            <input type="radio" name="ProgrammingGroup" value="ObjectiveC" />ObjectiveC<br />
+            <input type="radio" name="ProgrammingGroup" value="Cobol" />Cobol<br />
+            <input type="radio" name="ProgrammingGroup" value="Fortran" />Fortran<br />
+            <label id="forScriptingGroup">Select your favorite scripting code</label><br /><br />
+            <input type="radio" name="ScriptingGroup" value="Razor" />Razor<br />
+            <input type="radio" name="ScriptingGroup" value="Javascript" />Javascript<br /><br />
+            <button type="submit" class="btn btn-primary" value="submit"
+                    name="formbutton">
+                Submit
+            </button>
+        </form>
+    </div>
+</section>

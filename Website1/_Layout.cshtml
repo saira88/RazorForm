@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@Page.Title</title>
+    <script src="~/Scripts/jquery-2.2.0.js"></script>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap.js"></script>
+    @RenderSection("head", required: false)
+</head>
+<body>
+    <div class="container-fluid">
+        <header>
+            <!--the RenderPage will be the placeholder
+            for the physical file that will
+            contain our menu-->
+            @RenderPage("~/_Menu.cshtml")
+        </header>
+        <section>
+            <!--This is the default area where
+            the content page material will be
+            placed during the merging of the
+            _Layout page and the Context page.-->
+            @RenderBody()
+        </section>
+        <!--a placement for an option page footer-->
+        @RenderSection("foot", required: false)
+    </div>
+</body>
+</html>

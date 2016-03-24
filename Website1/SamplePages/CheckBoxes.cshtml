@@ -1,0 +1,57 @@
+﻿@{
+    Page.Title = "CheckBoxes";
+    Layout = "~/_Layout.cshtml";
+    
+    //all choices will be placed as a comma delimited string
+    //in one value for the checkbox group
+    var choices = Request["BoxGroup"];
+}
+
+<header class="jumbotron">
+    <h2>CheckBoxes</h2>
+</header>
+
+@if(IsPost)
+{
+    if (choices.IsEmpty())
+    {
+        <p><strong><span style="color:red">Not a player then ....</span></strong></p>
+    }
+    else
+    {
+        //the string of values is separate by a comma  value, value, value
+        //to .Split a string you need to specific the delimiter
+        
+        //create a character delimiter
+        char[] delimiter = { ',' };
+        <p>
+            I see you like to use the following platforms
+            <!--the list will be unordered ul-->
+            <ul>
+                <!--you need to loop through your value string
+        separating each value using the .Split() and
+        the defined dimilter-->
+                @foreach(var platformitem in choices.Split(delimiter))
+                {
+                    <li>@platformitem</li>
+                }
+            </ul>
+        </p>
+    }
+}
+<section>
+    <div class="form-group">
+        <form id="theForm" action="" method="post">
+            <label id="forCheckBoxGroup">Select your favorite Game Platforms</label><br/><br/>
+            <input type="checkbox" name="BoxGroup" value="PS4" />PS4<br/>
+            <input type="checkbox" name="BoxGroup" value="PC" />PC<br />
+            <input type="checkbox" name="BoxGroup" value="XBox 360" />XBox 360<br />
+            <input type="checkbox" name="BoxGroup" value="Nintendo DS" />Nintendo DS<br />
+            <input type="checkbox" name="BoxGroup" value="Cell Phone" />Cell Phone<br />
+            <input type="checkbox" name="BoxGroup" value="IPad" />IPad<br />
+            <input type="checkbox" name="BoxGroup" value="WII" />WII<br /><br/>
+            <button type="submit" class="btn btn-primary" value="submit"
+                    name="formbutton">Submit</button>
+        </form>
+    </div>
+</section>

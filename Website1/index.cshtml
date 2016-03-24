@@ -1,0 +1,36 @@
+﻿@{
+    //Razor Code Syntax
+    Page.Title = "Home";
+    //this line of code will link your content
+    //to the appropriate layout page
+    //You will use root relative addressing to
+    //indicate the location of the layout page.
+    //Root relative addressing for a web site is
+    //from the start of your web project
+    //The symbol used for this starting postion is ~
+    Layout = "~/_Layout.cshtml";
+}
+
+<!-- for this page I will override the .css for jumbotron
+    using the RenderSection() placeholder-->
+
+@section head
+{
+<link href="~/Content/CustomOverrides.css" rel="stylesheet" />
+}
+<div>
+
+
+    <header class="jumbotron">
+        <h2>Welcome to Basic Forms and Razor</h2>
+    </header>
+
+    <p>
+        This solution will contain sample of basic
+        web forms and processing using Razor(C#).
+    </p>
+    <p>
+        This is a content page which replaces the RenderBody
+        on the layout page.
+    </p>
+</div>

@@ -1,0 +1,73 @@
+﻿@{
+    Page.Title = "TextBoxes";
+    Layout = "~/_Layout.cshtml";
+
+    //content pages are executed from the physical start of
+    //the file to the physical end of the file
+    //Razor code blocks can be used to alter the logical
+    //progression through the file
+
+    //extract the data from the Request object instance
+    //this data is paired by control name and data value
+    //we can use a generic variable to capture the data
+    //the generic variable then takes on the datatype
+    var fielda = Request["fieldA"];
+    var fieldb = Request["fieldB"];
+    var buttonrequest = Request["formbutton"];
+}
+
+<div>
+    <header class="jumbotron">
+        <h2>TextBoxes</h2>
+    </header>
+    <!--you can use Razor to guide the logical creation of your web page
+        To test if the web page is a "post-back" check using if(IsPost)
+        The time the web page is retrieved IsPost is false
+        Each postback of the web page within the current squence
+        will have IsPost equal to true-->
+    @if (IsPost)
+    {
+        //within the razor code block you use C#
+        //you can have html code mixed within your razor code block
+        //any razor fields within yor hmtl tags is preceeded by the @ symbol
+        if (buttonrequest.Equals("reset"))
+        {
+            fielda = ""; //are within code block
+            fieldb = "";
+        }
+        <!-- to refer to a variable from your Razor code block
+        preceed the variable name with the "at" symbol-->
+        <p>You entered the follow in column1  &gt;@fielda &lt;</p>
+
+        <p>You entered the follow in column1  &gt;@fieldb &lt;</p>
+    }
+   
+
+    <div class="form-group">
+        <!--use bootstrap to create a basic two column form-->
+        <form id="theForm" action="" method="post">
+            <div class="row">
+                <div class="col-sm-6">
+                    In column 1:
+                    <input type="text" id="fieldA" name="fieldA" value="@fielda" />
+                </div>
+                <div class="col-sm-6">
+                    <label id="forfieldB">In column 2:</label>
+                    <input type="text" id="fieldB" name="fieldB" value="@fieldb" />
+                </div>
+            </div>
+            <div class="row">
+                <!-- the submit buttons for the form-->
+                <button type="submit" class="btn btn-primary" value="submit"
+                        name="formbutton">
+                    Submit
+                </button>
+                <button type="submit" class="btn" value="reset"
+                        name="formbutton">
+                    Reset
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
